@@ -7,7 +7,6 @@ echo ""
 echo "#########"
 echo "This utility will setup a new Ubuntu 12.04 LTS Server instance on EC2 to run as a data science server."
 echo "This script will install and configure the following tools:"
-echo " - IPython (with notebook server)"
 echo " - rstudio-server"
 echo " - shiny-server"
 echo "#########"
@@ -119,63 +118,6 @@ sudo gdebi -n shiny-server-0.4.0.15-amd64.deb
 sudo mkdir /srv/shiny-server/examples
 sudo cp -R /usr/local/lib/R/site-library/shiny/examples/* /srv/shiny-server/examples/
 
-echo ""
-echo "#########"
-echo "Downloading and installing Python development and scientific support libraries"
-echo "#########"
-
-sudo apt-get install -y -qq python-dev python-scipy python-numpy python-matplotlib python-pandas python-nose python-sympy python-scikits.learn
-
-echo ""
-echo "#########"
-echo "Downloading and installing Python setuptools"
-echo "#########"
-
-# Download and install setuptools for Python
-wget http://pypi.python.org/packages/source/s/setuptools/setuptools-0.6c11.tar.gz#md5=7df2a529a074f613b509fb44feefe74e
-tar -xvf setuptools-0.6c11.tar.gz
-cd setuptools-0.6c11/
-sudo python setup.py install --quiet	
-
-echo ""
-echo "#########"
-echo "Downloading and installing IPython support libraries"
-echo "#########"
-
-# Install supporting Python libs
-cd ..
-sudo easy_install Cython oct2py rpy2 wx azure
-
-echo ""
-echo "#########"
-echo "Installing IPython!"
-echo "#########"
-
-# Install iPython!
-sudo -y -qq easy_install ipython[all]
-
-echo ""
-echo "#########"
-echo "Creating IPython profile"
-echo "#########"
-
-# Create a profile for the ipython server, and install MathJax awesome while you're at it!
-cd ..
-ipython passwd.py $passwd
-passwd_file="passwd_hash.txt"
-passwd_hash=`cat $passwd_file`
-rm $passwd_file
-ipython profile create $profileName
-notebook_config="/home/ubuntu/.ipython/profile_$profileName/ipython_notebook_config.py"
-
-
-# Append to the config file the things you want
-echo "c.IPKernelApp.pylab = 'inline' " | sudo tee -a $notebook_config
-echo "c.NotebookApp.ip = '*' " | sudo tee -a $notebook_config
-echo "c.NotebookApp.open_browser = False " | sudo tee -a $notebook_config
-echo "c.NotebookApp.password = u'$passwd_hash'" | sudo tee -a $notebook_config
-echo "c.NotebookApp.port = 8888" | sudo tee -a $notebook_config
-echo "c.NotebookApp.certfile = '$path_to_pem'" | sudo tee -a $notebook_config
 
 # Clean up
 sudo rm -rf Downloads
@@ -187,6 +129,5 @@ echo "#########"
 echo "INSTALLTION COMPLETE!"
 echo "The RStudio server is available at http:[server-url]:8787"
 echo "shiny-server pages can be accessed at http:[server-url]:3838"
-echo "To start the IPython notebook server type: sudo ipython notebook --profile=$profileName"
 
 exit
